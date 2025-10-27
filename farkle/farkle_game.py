@@ -2,10 +2,25 @@ from __future__ import annotations
 
 import argparse
 import os
+import json
 import random
 import time
 from collections import Counter
+from pydantic import BaseModel
 
+class FarklePlayer(BaseModel):
+    name: str
+    score: int = 0
+
+class FarkleHand(BaseModel):
+    rolled_hand: list[str]
+    active_dice: list[str]
+    dice_already_banked: list[str]
+
+class GameState(BaseModel):
+    players: list[FarklePlayer] = []
+    current_player_name: str | None = None
+    currently_active_hand: FarkleHand | None = None
 
 class Farkle:
     def __init__(
@@ -15,14 +30,23 @@ class Farkle:
         score_limit: int,
         score_threshold: int,
         player_specify_set: bool,
+        initial_game_state: GameState
     ):
         self.num_players = num_players or 2
         self.order_dice = order_dice or True
         self.score_limit = score_limit or 10000
         self.score_threshold = score_threshold or 500
         self.player_specify_set = player_specify_set or False
-        self.get_players()
-        self.play()
+        self.state = initial_game_state
+        # self.get_players()
+        # self.play()
+
+    def _get_game_state(self):
+        return self.state
+    
+    def add_player(self, player_name: str):
+        self.state.players.append(FarklePlayer(name=player_name, score=0))
+        return
 
     def get_players(self):
         self.names = []
