@@ -8,19 +8,23 @@ import time
 from collections import Counter
 from pydantic import BaseModel
 
+
 class FarklePlayer(BaseModel):
     name: str
     score: int = 0
+
 
 class FarkleHand(BaseModel):
     rolled_hand: list[str]
     active_dice: list[str]
     dice_already_banked: list[str]
 
+
 class GameState(BaseModel):
     players: list[FarklePlayer] = []
     current_player_name: str | None = None
     currently_active_hand: FarkleHand | None = None
+
 
 class Farkle:
     def __init__(
@@ -30,7 +34,7 @@ class Farkle:
         score_limit: int,
         score_threshold: int,
         player_specify_set: bool,
-        initial_game_state: GameState
+        initial_game_state: GameState,
     ):
         self.num_players = num_players or 2
         self.order_dice = order_dice or True
@@ -43,7 +47,7 @@ class Farkle:
 
     def _get_game_state(self):
         return self.state
-    
+
     def add_player(self, player_name: str):
         self.state.players.append(FarklePlayer(name=player_name, score=0))
         return
@@ -121,7 +125,9 @@ class Farkle:
 
     def get_dice_roll(self, dice_count: int):
         if self.order_dice:
-            return "-".join(sorted([str(random.randint(1, 6)) for _ in range(dice_count)]))
+            return "-".join(
+                sorted([str(random.randint(1, 6)) for _ in range(dice_count)])
+            )
         else:
             return "-".join([str(random.randint(1, 6)) for _ in range(dice_count)])
 
@@ -137,7 +143,9 @@ class Farkle:
                 key=lambda x: x["score"],
                 reverse=True,
             )
-            set_reps = [f"{set['description']} for {set['score']}" for set in sorted_sets]
+            set_reps = [
+                f"{set['description']} for {set['score']}" for set in sorted_sets
+            ]
             print_sets = "\n".join(set_reps)
             time.sleep(0.5)
             print(
@@ -185,7 +193,10 @@ class Farkle:
                     player["live_dice"] = 6
                 return player["live_dice"], True, hold_score
             else:
-                if player["score"] < self.score_threshold and hold_score < self.score_threshold:
+                if (
+                    player["score"] < self.score_threshold
+                    and hold_score < self.score_threshold
+                ):
                     time.sleep(0.5)
                     print(
                         f"First score to be banked must be {self.score_threshold} or above"
@@ -202,7 +213,10 @@ class Farkle:
 
     def play(self):
         i = 0
-        while not any(player_stats["score"] >= self.score_limit for player_name, player_stats in self.players.items()):
+        while not any(
+            player_stats["score"] >= self.score_limit
+            for player_name, player_stats in self.players.items()
+        ):
             name = self.names[i % self.num_players]
             self.play_round(name, self.players[name])
             i += 1
@@ -211,7 +225,9 @@ class Farkle:
             f"Final Round for players with less than {self.score_limit} points!",
         )
         for player_name, player_stats in {
-            player: stats for player, stats in self.players.items() if stats["score"] < self.score_limit
+            player: stats
+            for player, stats in self.players.items()
+            if stats["score"] < self.score_limit
         }.items():
             self.play_round(player_name, player_stats)
         sorted_players = sorted(
@@ -238,7 +254,10 @@ class Farkle:
 
     def get_score_sets(self, roll_dict: dict):
         score_sets = []
-        if all(count == 2 for count in roll_dict.values()) and len(roll_dict.values()) == 3:
+        if (
+            all(count == 2 for count in roll_dict.values())
+            and len(roll_dict.values()) == 3
+        ):
             score_sets.append(
                 {
                     "description": "3 pairs",
@@ -306,7 +325,10 @@ class Farkle:
                 )
             if (
                 count in (1, 2)
-                and not (all(count == 2 for count in roll_dict.values()) and len(roll_dict.values()) == 3)
+                and not (
+                    all(count == 2 for count in roll_dict.values())
+                    and len(roll_dict.values()) == 3
+                )
                 and not len(roll_dict.values()) == 6
             ):
                 score = self.individual_scores.get(value, 0)
