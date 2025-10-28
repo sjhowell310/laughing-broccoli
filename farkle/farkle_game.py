@@ -27,7 +27,18 @@ class GameState(BaseModel):
 
 
 class Farkle:
-    def __init__(
+    def __init__(self):
+        pass
+        # self.num_players = num_players or 2
+        # self.order_dice = order_dice or True
+        # self.score_limit = score_limit or 10000
+        # self.score_threshold = score_threshold or 500
+        # self.player_specify_set = player_specify_set or False
+        # self.state = initial_game_state
+        # self.get_players()
+        # self.play()
+
+    def configure_game(
         self,
         num_players: int,
         order_dice: bool,
@@ -42,8 +53,6 @@ class Farkle:
         self.score_threshold = score_threshold or 500
         self.player_specify_set = player_specify_set or False
         self.state = initial_game_state
-        # self.get_players()
-        # self.play()
 
     def _get_game_state(self):
         return self.state
